@@ -13,6 +13,9 @@ filePool = open ('filePool.txt').readlines()
 
 counter = 0
 
+nave_size_x, nave_size_y = 128,96
+mar_size_x, mar_size_y = 128,96
+
 while counter < len(filePool):
 
     file = filePool[counter].split()
@@ -20,31 +23,31 @@ while counter < len(filePool):
     if file[0] == "nave":
         print ("Cargando grafico " + str(file[0]) + " => ", file[1])
         nave_img = pygame.image.load(file[1])
-        nave_img = pygame.transform.scale(nave_img, (128,96))
+        nave_img = pygame.transform.scale(nave_img, (nave_size_x,nave_size_y))
         nave_w, nave_h = nave_img.get_rect().size[0],nave_img.get_rect().size[1]
 
     elif file[0] == "marcianito1":
         print ("Cargando grafico " + str(file[0]) + " => " , file[1])
         mar1_img = pygame.image.load(file[1])
-        mar1_img = pygame.transform.scale(mar1_img, (128,96))
+        mar1_img = pygame.transform.scale(mar1_img, (mar_size_x,mar_size_y))
         mar1_w, mar1_h = mar1_img.get_rect().size[0],mar1_img.get_rect().size[1]
 
     elif file[0] == "marcianito2":
         print ("Cargando grafico " + str(file[0]) + " => " , file[1])
         mar2_img = pygame.image.load(file[1])
-        mar2_img = pygame.transform.scale(mar2_img, (128,96))
+        mar2_img = pygame.transform.scale(mar2_img, (mar_size_x,mar_size_y))
         mar2_w, mar2_h = mar2_img.get_rect().size[0],mar2_img.get_rect().size[1]
 
     elif file[0] == "marcianito3":
         print ("Cargando grafico " + str(file[0]) + " => " , file[1])
         mar3_img = pygame.image.load(file[1])
-        mar3_img = pygame.transform.scale(mar3_img, (128,96))
+        mar3_img = pygame.transform.scale(mar3_img, (mar_size_x,mar_size_y))
         mar3_w, mar3_h = mar3_img.get_rect().size[0],mar3_img.get_rect().size[1]
 
     elif file[0] == "fondo":
         print ("Cargando grafico " + str(file[0]) + " => " , file[1])
         fondo_img = pygame.image.load(file[1])
-        fondo_img  = pygame.transform.scale(fondo_img , (1280,800))
+        fondo_img  = pygame.transform.scale(fondo_img , (screen_w,screen_h))
         fondo_w, fondo_h = fondo_img.get_rect().size[0],fondo_img.get_rect().size[1]
 
     counter = counter + 1
