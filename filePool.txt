@@ -4,3 +4,4 @@ marcianito2 marcianito2.png
 marcianito3 marcianito3.png
 nodriza nodriza.png
 fondo fondo.png
+meteo meteo.png
