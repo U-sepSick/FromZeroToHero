@@ -6,11 +6,12 @@ fpsClock = pygame.time.Clock()
 
 # ===== Sizes ===== #
 #Window
-screenSize_X, screenSize_Y = 1280, 800
+screenSize_X, screenSize_Y = 600, 800
 #Player
-playerSize_X, playerSize_Y = 128, 96
+playerSize_X, playerSize_Y = 128, 128
+shootSize_X, shootSize_Y = 16,32
 #Martians
-martSize_X, martSize_Y = 128, 96
+martSize_X, martSize_Y = 128, 128
 
 # Print Window
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
@@ -35,11 +36,6 @@ while counter < len(filePool):
         idle_img = pygame.image.load(file[1])
         idle_img = pygame.transform.scale(idle_img, (playerSize_X,playerSize_Y))
 
-    elif file[0] == "upDown":
-        print ("Load file " + str(file[0]) + " => " , file[1])
-        upDown_img = pygame.image.load(file[1])
-        upDown_img = pygame.transform.scale(upDown_img, (playerSize_X,playerSize_Y))
-
     elif file[0] == "turnR":
         print ("Load file " + str(file[0]) + " => " , file[1])
         turnR_img = pygame.image.load(file[1])
@@ -49,6 +45,11 @@ while counter < len(filePool):
         print ("Load file " + str(file[0]) + " => " , file[1])
         turnL_img = pygame.image.load(file[1])
         turnL_img = pygame.transform.scale(turnL_img, (playerSize_X,playerSize_Y))
+
+    elif file[0] == "shoot":
+        print ("Load file " + str(file[0]) + " => " , file[1])
+        shoot_img = pygame.image.load(file[1])
+        shoot_img = pygame.transform.scale(shoot_img, (shootSize_X,shootSize_Y))
 
     elif file[0] == "Martian1":
         print ("Load file " + str(file[0]) + " => " , file[1])
@@ -77,14 +78,14 @@ while counter < len(filePool):
 
     counter = counter + 1
 
-# ===== Positions ===== #
+# ===== Positions & bools ===== #
 
 player_posX = 0
 player_posY = screenSize_Y - playerSize_Y
 
 player_vel = 10
 
-mart1_posX = []
+#mart1_posX = []
 
 mart1_posX = random.randint(0,screenSize_X - playerSize_X)
 mart1_posY = -100
@@ -102,13 +103,48 @@ mars_Dir = 1
 
 exitGame = False
 
+shooted = False
+shoot_posX = -1000
+shoot_posY = -1000
+shootSpeed = 20
+
+# ===== Shoot ===== # 
+def Shoot(x, y):
+
+    global shoot_posX
+    global shoot_posY
+    global shootSpeed
+    global shooted
+
+    if shoot_posX == -1000:
+        shoot_posX = x - shootSize_X/2
+        shoot_posY = y
+
+    surface.blit(shoot_img, (shoot_posX, shoot_posY - 35))
+
+    contador = 0
+        #while contador < len ()
+
+#        if shootX >= mart1_posX and shootX <= mart1_posX + martSize_X:
+#            if shootY >= mart1_posY and shootY <= mart + martSize_Y:
+#                print("Muerto")
+
+ #       contador = contador + 1
+ #       
+    shoot_posY = shoot_posY - shootSpeed
+
+    if shoot_posY <= 0:
+        shooted = False
+        shoot_posX = -1000
+        shoot_posY = -1000
+
 # ===== Game ===== # 
 while not exitGame:
 
-    # Clean window filling of color or image
+    # Clean window filling of color
     surface.fill((0,0,0))
 
-    # Carga de archivos
+    # Print files
     surface.blit(background_img, (0, screenSize_Y - screenSize_Y))
     surface.blit(player_img, (player_posX, player_posY))    
     surface.blit(mart1_img, (mart1_posX, mart1_posY))
@@ -119,32 +155,23 @@ while not exitGame:
     # Martians movement
     mart1_posY = mart1_posY + mars_Dir * player_vel/2
     if mart1_posY >= screenSize_Y + martSize_Y:
-        mart1_posX = random.randint(0, screenSize_X - playerSize_X)
+        mart1_posX = random.randint(0, screenSize_X - mart1_posX)
         mart1_posY = 0
 
     mart2_posY = mart2_posY + mars_Dir * player_vel/2
     if mart2_posY >= screenSize_Y + martSize_Y:
-        mart2_posX = random.randint(0, screenSize_X - playerSize_X)
+        mart2_posX = random.randint(0, screenSize_X - mart2_posX)
         mart2_posY = 0
 
     mart3_posY = mart3_posY + mars_Dir * player_vel/2
     if mart3_posY >= screenSize_Y + martSize_Y:
-        mart3_posX = random.randint(0, screenSize_X - playerSize_X)
+        mart3_posX = random.randint(0, screenSize_X - mart3_posX)
         mart3_posY = 0
 
     mart4_posY = mart4_posY + mars_Dir * player_vel/2
     if mart4_posY >= screenSize_Y + martSize_Y:
-        mart4_posX = random.randint(0, screenSize_X - playerSize_X)
+        mart4_posX = random.randint(0, screenSize_X - mart4_posX)
         mart4_posY = 0
-
-    #if mart1_posX >= screenSize_X - martSize_X:
-     #   mars_Dir = -1
-    #elif mart1_posX <= 0:
-     #   mars_Dir = 1
-
-
-    pygame.display.update()
-    fpsClock.tick(30)
 
 # ===== Inputs ===== #    
 
@@ -186,25 +213,31 @@ while not exitGame:
            player_posX = screenSize_X - playerSize_X
     # Move up
     elif keys[pygame.K_UP]:
-        player_img = upDown_img
         player_posY = player_posY - player_vel
         # Upper limit
         if player_posY <= 0:
            player_posY = 0
     # Move down
     elif keys[pygame.K_DOWN]:
-        player_img = upDown_img
         player_posY = player_posY + player_vel
         # Lower limit
         if player_posY >= screenSize_Y - playerSize_Y:
            player_posY = screenSize_Y - playerSize_Y
+    # shoot
+    if keys[pygame.K_SPACE]:
+        if not shooted:
+            shooted = True
+    if shooted:        
+        Shoot(player_posX + playerSize_X/2, player_posY)
+
+    pygame.display.update()
+    fpsClock.tick(30)
 
     for Event in pygame.event.get():
         if Event.type == pygame.KEYUP:
             player_img = idle_img
 
 # ===== Close ===== #
-
         if Event.type == pygame.QUIT:
             pygame.quit()
             exitGame = True
