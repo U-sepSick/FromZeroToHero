@@ -1,4 +1,8 @@
-Spacecraft Spacecraft.png
+Player Player.png
+idle idle.png
+upDown upDown.png
+turnR turnR.png
+turnL turnL.png
 Martian1 Martian1.png
 Martian2 Martian2.png
 Martian3 Martian3.png
