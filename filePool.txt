@@ -1,10 +1,10 @@
-Player Player.png
-idle idle.png
-turnR turnR.png
-turnL turnL.png
-shoot shoot.png
-Martian1 Martian1.png
-Martian2 Martian2.png
-Martian3 Martian3.png
-Martian4 Martian4.png
-Background Background.png
+Player Player.png 128 x 128
+idle idle.png 128 x 128
+turnR turnR.png 128 x 128
+turnL turnL.png 128 x 128
+shoot shoot.png 16 x 32
+Martian1 Martian1.png 128 x 128
+Martian2 Martian2.png 128 x 128
+Martian3 Martian3.png 128 x 128
+Martian4 Martian4.png 128 x 128
+Background Background.png 600 x 800

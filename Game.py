@@ -4,85 +4,74 @@ from pygame.locals import *
 pygame.init()
 fpsClock = pygame.time.Clock()
 
-# ===== Sizes ===== #
-#Window
-screenSize_X, screenSize_Y = 600, 800
-#Player
-playerSize_X, playerSize_Y = 128, 128
-shootSize_X, shootSize_Y = 16,32
-#Martians
-martSize_X, martSize_Y = 128, 128
-#Animation
-animSize_X, animSize_Y = 32,46
-
-# Print Window
-surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
-
-# ===== Load files ===== #
-# Open file
+# ===== Open file ===== #
 filePool = open ('filePool.txt').readlines()
 animPool = open ('AnimPool.txt').readlines()
-
-listaImagenes = []
-
+# ===== Load files ===== #
 counter = 0
-animCounter = 0
-
 while counter < len(filePool):
 
     file = filePool[counter].split()
 
     if file[0] == "Player":
-        print ("Load file " + str(file[0]) + " => ", file[1])
+        print ("Load file " + str(file[0]) + " => ", file[1] + " - tamaño => " + file[2] + " x " + file[4])
+        playerSize_X, playerSize_Y = int(file[2]), int(file[4])
         player_img = pygame.image.load(file[1])
         player_img = pygame.transform.scale(player_img, (playerSize_X,playerSize_Y))
 
     elif file[0] == "idle":
-        print ("Load file " + str(file[0]) + " => ", file[1])
+        print ("Load file " + str(file[0]) + " => ", file[1] + " - tamaño => " + file[2] + " x " + file[4])
         idle_img = pygame.image.load(file[1])
         idle_img = pygame.transform.scale(idle_img, (playerSize_X,playerSize_Y))
 
     elif file[0] == "turnR":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
         turnR_img = pygame.image.load(file[1])
         turnR_img = pygame.transform.scale(turnR_img, (playerSize_X,playerSize_Y))
 
     elif file[0] == "turnL":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
         turnL_img = pygame.image.load(file[1])
         turnL_img = pygame.transform.scale(turnL_img, (playerSize_X,playerSize_Y))
 
     elif file[0] == "shoot":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
+        shootSize_X, shootSize_Y = int(file[2]), int(file[4])
         shoot_img = pygame.image.load(file[1])
         shoot_img = pygame.transform.scale(shoot_img, (shootSize_X,shootSize_Y))
 
     elif file[0] == "Martian1":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
+        martSize_X, martSize_Y = int(file[2]), int(file[4])
         mart1_img = pygame.image.load(file[1])
         mart1_img = pygame.transform.scale(mart1_img, (martSize_X,martSize_Y))
 
     elif file[0] == "Martian2":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
         mart2_img = pygame.image.load(file[1])
         mart2_img = pygame.transform.scale(mart2_img, (martSize_X,martSize_Y))
 
     elif file[0] == "Martian3":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
         mart3_img = pygame.image.load(file[1])
         mart3_img = pygame.transform.scale(mart3_img, (martSize_X,martSize_Y))
 
     elif file[0] == "Martian4":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
         mart4_img = pygame.image.load(file[1])
         mart4_img = pygame.transform.scale(mart4_img, (martSize_X,martSize_Y))
 
     elif file[0] == "Background":
-        print ("Load file " + str(file[0]) + " => " , file[1])
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
+        screenSize_X, screenSize_Y = int(file[2]), int(file[4])
         background_img = pygame.image.load(file[1])
         background_img  = pygame.transform.scale(background_img , (screenSize_X,screenSize_Y))
 
     counter = counter + 1
+# ===== Animation ===== #
+animSize_X, animSize_Y = 32,46
+listaImagenes = []
+animCounter = 0
 while animCounter < len(animPool):
 
     file = animPool[animCounter].splitlines()
@@ -159,6 +148,8 @@ def Shoot(x, y):
         shoot_posX = -1000
         shoot_posY = -1000
 
+# ===== Print Window ===== #
+surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 # ===== Game ===== # 
 while not exitGame:
 
