@@ -7,7 +7,7 @@ fpsClock = pygame.time.Clock()
 #Window
 screenSize_X, screenSize_Y = 600, 800
 #Player
-playerSize_X, playerSize_Y = 64, 64 
+playerSize_X, playerSize_Y = 40, 56
 
 
 # Print Window

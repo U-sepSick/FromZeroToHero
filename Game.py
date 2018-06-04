@@ -12,6 +12,8 @@ playerSize_X, playerSize_Y = 128, 128
 shootSize_X, shootSize_Y = 16,32
 #Martians
 martSize_X, martSize_Y = 128, 128
+#Animation
+animSize_X, animSize_Y = 32,46
 
 # Print Window
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
@@ -19,8 +21,12 @@ surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 # ===== Load files ===== #
 # Open file
 filePool = open ('filePool.txt').readlines()
+animPool = open ('AnimPool.txt').readlines()
+
+listaImagenes = []
 
 counter = 0
+animCounter = 0
 
 while counter < len(filePool):
 
@@ -77,6 +83,16 @@ while counter < len(filePool):
         background_img  = pygame.transform.scale(background_img , (screenSize_X,screenSize_Y))
 
     counter = counter + 1
+while animCounter < len(animPool):
+
+    file = animPool[animCounter].splitlines()
+
+    anim_img = pygame.image.load(file[0])
+    anim_img = pygame.transform.scale(anim_img, (animSize_X,animSize_Y))
+
+    listaImagenes.append(anim_img)
+
+    animCounter = animCounter + 1
 
 # ===== Positions & bools ===== #
 
@@ -84,8 +100,6 @@ player_posX = 0
 player_posY = screenSize_Y - playerSize_Y
 
 player_vel = 10
-
-#mart1_posX = []
 
 mart1_posX = random.randint(0,screenSize_X - playerSize_X)
 mart1_posY = -100
@@ -101,12 +115,19 @@ mart4_posY = -700
 
 mars_Dir = 1
 
+posImagen = 0
+
+animOffset = 28
+
 exitGame = False
 
 shooted = False
 shoot_posX = -1000
 shoot_posY = -1000
 shootSpeed = 20
+
+turnLeft = False
+turnRight = False
 
 # ===== Shoot ===== # 
 def Shoot(x, y):
@@ -141,6 +162,12 @@ def Shoot(x, y):
 # ===== Game ===== # 
 while not exitGame:
 
+    # Animations
+    posImagen +=1
+    if posImagen > len(listaImagenes)-1:
+        posImagen = 0
+    imagenAnim = listaImagenes[posImagen]
+
     # Clean window filling of color
     surface.fill((0,0,0))
 
@@ -151,6 +178,17 @@ while not exitGame:
     surface.blit(mart2_img, (mart2_posX, mart2_posY))
     surface.blit(mart3_img, (mart3_posX, mart3_posY))
     surface.blit(mart4_img, (mart4_posX, mart4_posY))
+    # Print Animations
+    surface.blit(imagenAnim, (player_posX + playerSize_X/2 - animSize_X/2, player_posY + playerSize_Y)) 
+
+
+    if turnLeft == False :
+        imagenAnim = pygame.transform.scale(imagenAnim, (animSize_X - 20,animSize_Y - 20))
+        surface.blit(imagenAnim, (player_posX + 10, player_posY + playerSize_Y))
+
+    if turnRight == False :
+        imagenAnim = pygame.transform.scale(imagenAnim, (animSize_X - 20,animSize_Y - 20))
+        surface.blit(imagenAnim, (player_posX + playerSize_X - animSize_X + 6, player_posY + playerSize_Y))
 
     # Martians movement
     mart1_posY = mart1_posY + mars_Dir * player_vel/2
@@ -173,14 +211,22 @@ while not exitGame:
         mart4_posX = random.randint(0, screenSize_X - mart4_posX)
         mart4_posY = 0
 
+
 # ===== Inputs ===== #    
 
     keys = pygame.key.get_pressed()
+
+# Fallo con los inputs, si tienes presionada la LEFT no puedes moverte hacia otra direccion
+# las animaciones van raras con varias teclas presionadas.
 
     # Move left
     if keys[pygame.K_LEFT]:
         player_img = turnL_img
         player_posX = player_posX - player_vel
+        turnLeft = True
+        if turnLeft == True and turnRight == False:
+            surface.blit(imagenAnim, (player_posX + animOffset + 12, player_posY + playerSize_Y))
+
         if keys[pygame.K_DOWN]:
             player_posY = player_posY + player_vel
             # Lower limit
@@ -198,6 +244,11 @@ while not exitGame:
     elif keys[pygame.K_RIGHT]:
         player_img = turnR_img
         player_posX = player_posX + player_vel
+        turnRight = True
+        if turnRight == True and turnLeft == False:
+            surface.blit(imagenAnim, (player_posX + playerSize_X -animOffset - animSize_X + 4, player_posY + playerSize_Y))
+
+
         if keys[pygame.K_DOWN]:
             player_posY = player_posY + player_vel
             # Lower limit
@@ -236,6 +287,8 @@ while not exitGame:
     for Event in pygame.event.get():
         if Event.type == pygame.KEYUP:
             player_img = idle_img
+            turnLeft = False
+            turnRight = False
 
 # ===== Close ===== #
         if Event.type == pygame.QUIT:
