@@ -42,24 +42,13 @@ while counter < len(filePool):
 
     elif file[0] == "Martian1":
         print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
+
+        mart1_file = file[1]
+        mart1_img = pygame.image.load(file[1])
+
         martSize_X, martSize_Y = int(file[2]), int(file[4])
         mart1_img = pygame.image.load(file[1])
         mart1_img = pygame.transform.scale(mart1_img, (martSize_X,martSize_Y))
-
-    elif file[0] == "Martian2":
-        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
-        mart2_img = pygame.image.load(file[1])
-        mart2_img = pygame.transform.scale(mart2_img, (martSize_X,martSize_Y))
-
-    elif file[0] == "Martian3":
-        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
-        mart3_img = pygame.image.load(file[1])
-        mart3_img = pygame.transform.scale(mart3_img, (martSize_X,martSize_Y))
-
-    elif file[0] == "Martian4":
-        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
-        mart4_img = pygame.image.load(file[1])
-        mart4_img = pygame.transform.scale(mart4_img, (martSize_X,martSize_Y))
 
     elif file[0] == "Background":
         print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
@@ -68,6 +57,31 @@ while counter < len(filePool):
         background_img  = pygame.transform.scale(background_img , (screenSize_X,screenSize_Y))
 
     counter = counter + 1
+
+martNum = 4
+martOnScreen = 0
+
+mart1List = []
+Mart1_pos = []
+
+ini_posX = 0
+cur_posX = 0
+
+ini_posY = 0
+
+DelayBtwMart = 10
+
+while martOnScreen < martNum:
+
+    mart1List.append(pygame.image.load(mart1_file))
+
+    ini_posX = random.randint(0,screenSize_X - playerSize_X)
+    ini_posY = random.randint(0 , screenSize_Y)
+
+    Mart1_pos.append((ini_posX , ini_posY))
+
+    martOnScreen = martOnScreen + 1
+
 # ===== Animation ===== #
 animSize_X, animSize_Y = 32,46
 listaImagenes = []
@@ -90,17 +104,8 @@ player_posY = screenSize_Y - playerSize_Y
 
 player_vel = 10
 
-mart1_posX = random.randint(0,screenSize_X - playerSize_X)
-mart1_posY = -100
-
-mart2_posX = random.randint(0,screenSize_X - playerSize_X)
-mart2_posY = -300
-
-mart3_posX = random.randint(0,screenSize_X - playerSize_X)
-mart3_posY = -500
-
-mart4_posX = random.randint(0,screenSize_X - playerSize_X)
-mart4_posY = -700
+mart_posX = 0
+mart_posY = 0
 
 mars_Dir = 1
 
@@ -117,6 +122,7 @@ shootSpeed = 20
 
 turnLeft = False
 turnRight = False
+
 
 # ===== Shoot ===== # 
 def Shoot(x, y):
@@ -150,6 +156,7 @@ def Shoot(x, y):
 
 # ===== Print Window ===== #
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
+
 # ===== Game ===== # 
 while not exitGame:
 
@@ -162,17 +169,18 @@ while not exitGame:
     # Clean window filling of color
     surface.fill((0,0,0))
 
-    # Print files
+    # Print background
     surface.blit(background_img, (0, screenSize_Y - screenSize_Y))
+    # Print Marts 1
+    martCount = 0 
+    while martCount < martNum:
+        surface.blit(mart1List[martCount], (Mart1_pos[martCount]))
+        martCount = martCount + 1
+
+    # Print Player
     surface.blit(player_img, (player_posX, player_posY))    
-    surface.blit(mart1_img, (mart1_posX, mart1_posY))
-    surface.blit(mart2_img, (mart2_posX, mart2_posY))
-    surface.blit(mart3_img, (mart3_posX, mart3_posY))
-    surface.blit(mart4_img, (mart4_posX, mart4_posY))
     # Print Animations
     surface.blit(imagenAnim, (player_posX + playerSize_X/2 - animSize_X/2, player_posY + playerSize_Y)) 
-
-
     if turnLeft == False :
         imagenAnim = pygame.transform.scale(imagenAnim, (animSize_X - 20,animSize_Y - 20))
         surface.blit(imagenAnim, (player_posX + 10, player_posY + playerSize_Y))
@@ -182,26 +190,11 @@ while not exitGame:
         surface.blit(imagenAnim, (player_posX + playerSize_X - animSize_X + 6, player_posY + playerSize_Y))
 
     # Martians movement
-    mart1_posY = mart1_posY + mars_Dir * player_vel/2
-    if mart1_posY >= screenSize_Y + martSize_Y:
-        mart1_posX = random.randint(0, screenSize_X - mart1_posX)
-        mart1_posY = 0
-
-    mart2_posY = mart2_posY + mars_Dir * player_vel/2
-    if mart2_posY >= screenSize_Y + martSize_Y:
-        mart2_posX = random.randint(0, screenSize_X - mart2_posX)
-        mart2_posY = 0
-
-    mart3_posY = mart3_posY + mars_Dir * player_vel/2
-    if mart3_posY >= screenSize_Y + martSize_Y:
-        mart3_posX = random.randint(0, screenSize_X - mart3_posX)
-        mart3_posY = 0
-
-    mart4_posY = mart4_posY + mars_Dir * player_vel/2
-    if mart4_posY >= screenSize_Y + martSize_Y:
-        mart4_posX = random.randint(0, screenSize_X - mart4_posX)
-        mart4_posY = 0
-
+    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
+#    mart_posY = mart_posY + mars_Dir * player_vel/2
+#    if mart_posY >= screenSize_Y + martSize_Y:
+#        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
+#        mart_posY = 0
 
 # ===== Inputs ===== #    
 
