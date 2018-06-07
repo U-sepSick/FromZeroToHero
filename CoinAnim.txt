@@ -1,4 +1,0 @@
-Coin_1 Coin_1.png
-Coin_2 Coin_2.png
-Coin_3 Coin_3.png
-Coin_4 Coin_4.png
