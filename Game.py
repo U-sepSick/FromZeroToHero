@@ -157,6 +157,9 @@ def Shoot(x, y):
 # ===== Print Window ===== #
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 
+Left = False
+Right = False
+
 # ===== Game ===== # 
 while not exitGame:
 
@@ -190,92 +193,92 @@ while not exitGame:
         surface.blit(imagenAnim, (player_posX + playerSize_X - animSize_X + 6, player_posY + playerSize_Y))
 
     # Martians movement
-    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
+#    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
 #    mart_posY = mart_posY + mars_Dir * player_vel/2
 #    if mart_posY >= screenSize_Y + martSize_Y:
 #        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
 #        mart_posY = 0
-
+ 
 # ===== Inputs ===== #    
-
-    keys = pygame.key.get_pressed()
-
-# Fallo con los inputs, si tienes presionada la LEFT no puedes moverte hacia otra direccion
-# las animaciones van raras con varias teclas presionadas.
-
-    # Move left
-    if keys[pygame.K_LEFT]:
-        player_img = turnL_img
+    key = pygame.key.get_pressed()
+    # Move Left
+    if key[pygame.K_LEFT] and Left == True:
         player_posX = player_posX - player_vel
-        turnLeft = True
-        if turnLeft == True and turnRight == False:
-            surface.blit(imagenAnim, (player_posX + animOffset + 12, player_posY + playerSize_Y))
-
-        if keys[pygame.K_DOWN]:
-            player_posY = player_posY + player_vel
-            # Lower limit
-            if player_posY >= screenSize_Y - playerSize_Y:
-               player_posY = screenSize_Y - playerSize_Y
-        if keys[pygame.K_UP]:
+        # Move up
+        if key[pygame.K_UP]:
             player_posY = player_posY - player_vel
             # Upper limit
             if player_posY <= 0:
                player_posY = 0
+        # Move down
+        if key[pygame.K_DOWN]:
+            player_posY = player_posY + player_vel
+            # Lower limit
+            if player_posY >= screenSize_Y - playerSize_Y:
+               player_posY = screenSize_Y - playerSize_Y
         # Left limit
         if player_posX <= 0:
-           player_posX = 0
-    # Move right
-    elif keys[pygame.K_RIGHT]:
-        player_img = turnR_img
+            player_posX = 0
+    # Move Right
+    elif key[pygame.K_RIGHT] and Right == True:
         player_posX = player_posX + player_vel
-        turnRight = True
-        if turnRight == True and turnLeft == False:
-            surface.blit(imagenAnim, (player_posX + playerSize_X -animOffset - animSize_X + 4, player_posY + playerSize_Y))
-
-
-        if keys[pygame.K_DOWN]:
-            player_posY = player_posY + player_vel
-            # Lower limit
-            if player_posY >= screenSize_Y - playerSize_Y:
-               player_posY = screenSize_Y - playerSize_Y
-        if keys[pygame.K_UP]:
+        # Move up
+        if key[pygame.K_UP]:
             player_posY = player_posY - player_vel
             # Upper limit
             if player_posY <= 0:
                player_posY = 0
+        # Move down
+        if key[pygame.K_DOWN]:
+            player_posY = player_posY + player_vel
+            # Lower limit
+            if player_posY >= screenSize_Y - playerSize_Y:
+               player_posY = screenSize_Y - playerSize_Y
         # Right limit
         if player_posX >= screenSize_X - playerSize_X:
            player_posX = screenSize_X - playerSize_X
     # Move up
-    elif keys[pygame.K_UP]:
+    elif key[pygame.K_UP]:
         player_posY = player_posY - player_vel
         # Upper limit
         if player_posY <= 0:
            player_posY = 0
     # Move down
-    elif keys[pygame.K_DOWN]:
+    elif key[pygame.K_DOWN]:
         player_posY = player_posY + player_vel
         # Lower limit
         if player_posY >= screenSize_Y - playerSize_Y:
            player_posY = screenSize_Y - playerSize_Y
-    # shoot
-    if keys[pygame.K_SPACE]:
+# ===== Shoot ===== #
+    if key[pygame.K_SPACE]:
         if not shooted:
             shooted = True
     if shooted:        
         Shoot(player_posX + playerSize_X/2, player_posY)
-
+# ===== Update Window ===== #
     pygame.display.update()
     fpsClock.tick(30)
+# ===== Check Keys ===== #
+    for event in pygame.event.get():
 
-    for Event in pygame.event.get():
-        if Event.type == pygame.KEYUP:
-            player_img = idle_img
-            turnLeft = False
-            turnRight = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            Left = True
+            Right = False
 
+        elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+            Left = False
+            Right = True
+
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            Left = False
+            Right = True
+
+        elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+            Left = True
+            Right = False
 # ===== Close ===== #
-        if Event.type == pygame.QUIT:
-            pygame.quit()
-            exitGame = True
-# ================= #     
+    if event.type == pygame.QUIT:
+        pygame.quit()
+        exitGame = True
+# ================= #
+    
