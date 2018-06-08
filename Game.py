@@ -131,6 +131,9 @@ shootSpeed = 20
 Left = False
 Right = False
 
+background1_posY = screenSize_Y/2
+background2_posY = screenSize_Y/2 - screenSize_Y
+background_vel = player_vel/4
 # ===== Shoot ===== # 
 def Shoot(x, y):
 
@@ -163,14 +166,8 @@ def Shoot(x, y):
 
 # ===== Print Window ===== #
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
-
-
-
 # ===== Game ===== # 
 while not exitGame:
-
-    print("Left " + str(Left))
-    print("Right " + str(Right))
 
     # Player Animation
     posImagen +=1
@@ -181,9 +178,21 @@ while not exitGame:
     # Clean window filling of color
     surface.fill((0,0,0))
 
-    # Print background
-    surface.blit(background_img, (0, screenSize_Y - screenSize_Y))
+    #===== Scrolling background =======#
+    background1_posY += 1 * background_vel
+    background2_posY += 1 * background_vel
 
+    # Print background
+    surface.blit(background_img, (0, background1_posY ))
+    surface.blit(background_img, (0, background2_posY))
+
+    if background1_posY >= 800:
+        background1_posY = -800
+
+    if background2_posY >= 800:
+        background2_posY = -800
+    #===================#
+   
     # Print Marts 1
     martCount = 0 
     while martCount < martNum:
