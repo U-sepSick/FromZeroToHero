@@ -1,3 +1,11 @@
-F_00.png
-F_01.png
-F_02.png
+PlayerAnim PlayerAnim_00.png 32 x 46
+PlayerAnim PlayerAnim_01.png 32 x 46
+PlayerAnim PlayerAnim_02.png 32 x 46
+ExplosionAnim ExpAnim_00.png 128 x 128
+ExplosionAnim ExpAnim_01.png 128 x 128
+ExplosionAnim ExpAnim_02.png 128 x 128
+ExplosionAnim ExpAnim_03.png 128 x 128
+ExplosionAnim ExpAnim_04.png 128 x 128
+ExplosionAnim ExpAnim_05.png 128 x 128
+ExplosionAnim ExpAnim_06.png 128 x 128
+ExplosionAnim ExpAnim_07.png 128 x 128
