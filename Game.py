@@ -7,7 +7,7 @@ fpsClock = pygame.time.Clock()
 # ===== Open file ===== #
 filePool = open ('filePool.txt').readlines()
 animPool = open ('AnimPool.txt').readlines()
-# ===== Load files ===== #
+# ===== Load main files ===== #
 counter = 0
 while counter < len(filePool):
 
@@ -57,8 +57,9 @@ while counter < len(filePool):
         background_img  = pygame.transform.scale(background_img , (screenSize_X,screenSize_Y))
 
     counter = counter + 1
-# ===== Animations ===== #
-PlayerAnimList = []
+# ===== Load animations files ===== #
+MotorAnimList = []
+motorImgPos = 0
 ExpAnimList = []
 animCounter = 0
 while animCounter < len(animPool):
@@ -70,7 +71,7 @@ while animCounter < len(animPool):
         PlayerAnim_img = pygame.image.load(file[1])
         PlayerAnim_img = pygame.transform.scale(PlayerAnim_img, (PlayerAnimSize_X, PlayerAnimSize_Y))
 
-        PlayerAnimList.append(PlayerAnim_img)
+        MotorAnimList.append(PlayerAnim_img)
     
     if file[0] == "ExplosionAnim":
         ExplosionAnimSize_X, ExplosionAnimSize_Y = int(file[2]), int(file[4])
@@ -80,6 +81,18 @@ while animCounter < len(animPool):
         ExpAnimList.append(ExplosionAnim_img)
 
     animCounter = animCounter + 1
+# ===== Player Var ===== #
+player_posX = screenSize_X/2 - playerSize_X/2
+player_posY = screenSize_Y/2 - playerSize_Y/2
+player_vel = 10
+# ===== Martians Var ===== #
+mart_posX = 0
+mart_posY = 0
+mars_Dir = 1
+# ===== Check Keys Var ===== #
+Left = False
+Right = False
+IsPushed = []
 # ===== Martians ===== #
 martNum = 4
 martOnScreen = 0
@@ -105,36 +118,15 @@ while martOnScreen < martNum:
 
     martOnScreen = martOnScreen + 1
 
-# ===== Positions & bools ===== #
-
-player_posX = 0
-player_posY = screenSize_Y - playerSize_Y
-
-player_vel = 10
-
-mart_posX = 0
-mart_posY = 0
-
-mars_Dir = 1
-
-posImagen = 0
-
-animOffset = 28
-
-exitGame = False
-
-shooted = False
-shoot_posX = -1000
-shoot_posY = -1000
-shootSpeed = 20
-
-Left = False
-Right = False
-
+# ===== Background ===== # 
 background1_posY = screenSize_Y/2
 background2_posY = screenSize_Y/2 - screenSize_Y
 background_vel = player_vel/4
 # ===== Shoot ===== # 
+shooted = False
+shoot_posX = -1000
+shoot_posY = -1000
+shootSpeed = 30
 def Shoot(x, y):
 
     global shoot_posX
@@ -163,55 +155,52 @@ def Shoot(x, y):
         shooted = False
         shoot_posX = -1000
         shoot_posY = -1000
+# ===== Explosion ===== # 
+Explosion = False
+Exp_posX = -1000
+Exp_posY = -1000
+def Explosion (x, y):
+    global Exp_posX
+    global Exp_posY
 
+    if Exp_posX == -1000:
+        Exp_posX = x - ExplosionAnimSize_X/2
+        if Exp_posY == -1000:
+            Exp_posY = y - ExplosionAnimSize_Y/2
+# ========== # 
+exitGame = False
 # ===== Print Window ===== #
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 # ===== Game ===== # 
 while not exitGame:
 
+    print ("IsPushed " + str(IsPushed))
+
     # Player Animation
-    posImagen +=1
-    if posImagen > len(PlayerAnimList)-1:
-        posImagen = 0
-    imagenAnim = PlayerAnimList[posImagen]
+    motorImgPos +=1
+    if motorImgPos > len(MotorAnimList)-1:
+        motorImgPos = 0
+    motorAnim = MotorAnimList[motorImgPos]
 
     # Clean window filling of color
     surface.fill((0,0,0))
-
-    #===== Scrolling background =======#
+# =====  Scrolling background ===== #
     background1_posY += 1 * background_vel
     background2_posY += 1 * background_vel
-
     # Print background
     surface.blit(background_img, (0, background1_posY ))
     surface.blit(background_img, (0, background2_posY))
-
     if background1_posY >= 800:
         background1_posY = -800
-
     if background2_posY >= 800:
         background2_posY = -800
-    #===================#
+#===================#
    
     # Print Marts 1
     martCount = 0 
     while martCount < martNum:
         surface.blit(mart1List[martCount], (Mart1_pos[martCount]))
         martCount = martCount + 1
-
-    # Print Player
-    surface.blit(player_img, (player_posX, player_posY))    
-    # Print Animations
-    surface.blit(imagenAnim, (player_posX + playerSize_X/2 - PlayerAnimSize_X/2, player_posY + playerSize_Y)) 
-    if Left == False :
-        imagenAnim = pygame.transform.scale(imagenAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
-        surface.blit(imagenAnim, (player_posX + 10, player_posY + playerSize_Y))
-
-    if Right == False :
-        imagenAnim = pygame.transform.scale(imagenAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
-        surface.blit(imagenAnim, (player_posX + playerSize_X - PlayerAnimSize_X + 6, player_posY + playerSize_Y))
-
-
     # Martians movement
 #    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
 #    mart_posY = mart_posY + mars_Dir * player_vel/2
@@ -219,15 +208,30 @@ while not exitGame:
 #        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
 #        mart_posY = 0
 
- 
+    # Print Player
+    surface.blit(player_img, (player_posX, player_posY))
+# =====  Print Animations ===== #
+    # Main Motor
+    surface.blit(motorAnim, (player_posX + playerSize_X/2 - PlayerAnimSize_X/2, player_posY + playerSize_Y)) 
+    # Side Motors
+    motorAnim = pygame.transform.scale(motorAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
+    if Left == True and IsPushed[len(IsPushed)-1] == "Left":
+        motorLeft_posX = player_posX + playerSize_X/2 - 35
+        motorRight_posX = player_posX + playerSize_X/2 + 38
+    if Right == True and IsPushed[len(IsPushed)-1] == "Right":
+        motorLeft_posX = player_posX + playerSize_X/2 - 53
+        motorRight_posX = player_posX + playerSize_X/2 + 20
+    if Left == False and Right == False:
+        motorLeft_posX = player_posX + playerSize_X/2 - 53
+        motorRight_posX = player_posX + playerSize_X/2 + 38
+    surface.blit(motorAnim, (motorLeft_posX, player_posY + playerSize_Y))
+    surface.blit(motorAnim, (motorRight_posX, player_posY + playerSize_Y))
 # ===== Inputs ===== #    
     key = pygame.key.get_pressed()
     # Move Left
-    if key[pygame.K_LEFT] and Left == True:
+    if key[pygame.K_LEFT] and IsPushed[len(IsPushed)-1] == "Left":
         player_img = turnL_img
         player_posX = player_posX - player_vel
-        imagenAnim = pygame.transform.scale(imagenAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
-        surface.blit(imagenAnim, (player_posX + animOffset + 12, player_posY + playerSize_Y))       
         # Move up
         if key[pygame.K_UP]:
             player_posY = player_posY - player_vel
@@ -244,24 +248,22 @@ while not exitGame:
         if player_posX <= 0:
             player_posX = 0
     # Move Right
-    elif key[pygame.K_RIGHT] and Right == True:
+    elif key[pygame.K_RIGHT] and IsPushed[len(IsPushed)-1] == "Right":
         player_img = turnR_img
         player_posX = player_posX + player_vel
-        imagenAnim = pygame.transform.scale(imagenAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
-        surface.blit(imagenAnim, (player_posX + playerSize_X -animOffset - PlayerAnimSize_X + 4, player_posY + playerSize_Y))
-        # Move up
+        # move up
         if key[pygame.K_UP]:
             player_posY = player_posY - player_vel
-            # Upper limit
+            # upper limit
             if player_posY <= 0:
                player_posY = 0
-        # Move down
+        # move down
         if key[pygame.K_DOWN]:
             player_posY = player_posY + player_vel
-            # Lower limit
+            # lower limit
             if player_posY >= screenSize_Y - playerSize_Y:
                player_posY = screenSize_Y - playerSize_Y
-        # Right limit
+        # right limit
         if player_posX >= screenSize_X - playerSize_X:
            player_posX = screenSize_X - playerSize_X
     # Move up
@@ -282,28 +284,27 @@ while not exitGame:
             shooted = True
     if shooted:        
         Shoot(player_posX + playerSize_X/2, player_posY)
-# ===== Update Window ===== #
-    pygame.display.update()
-    fpsClock.tick(30)
 # ===== Check Keys ===== #
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            IsPushed.append("Left")
             Left = True
-            Right = False
         elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+            IsPushed.remove("Left")
             Left = False
-            Right = True
             player_img = idle_img
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            Left = False
             Right = True
+            IsPushed.append("Right")
         elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
-            Left = True
             Right = False
+            IsPushed.remove("Right")
             player_img = idle_img
+# ===== Update Window ===== #
+    pygame.display.update()
+    fpsClock.tick(30)
 # ===== Close ===== #
     if event.type == pygame.QUIT:
         pygame.quit()
         exitGame = True
 # ================= #
-    
