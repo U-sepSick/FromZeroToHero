@@ -94,6 +94,7 @@ Left = False
 Right = False
 IsPushed = []
 # ===== Martians ===== #
+
 martNum = 4
 martOnScreen = 0
 
@@ -101,17 +102,14 @@ mart1List = []
 Mart1_pos = []
 
 ini_posX = 0
-cur_posX = 0
-
 ini_posY = 0
-
-DelayBtwMart = 10
 
 while martOnScreen < martNum:
 
     mart1List.append(pygame.image.load(mart1_file))
 
     ini_posX = random.randint(0,screenSize_X - playerSize_X)
+    #ini_posY = random.randint(screenSize_Y , screenSize_Y + ini_posY)
     ini_posY = random.randint(0 , screenSize_Y)
 
     Mart1_pos.append((ini_posX , ini_posY))
@@ -175,7 +173,7 @@ surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 while not exitGame:
 
     print ("IsPushed " + str(IsPushed))
-
+    
     # Player Animation
     motorImgPos +=1
     if motorImgPos > len(MotorAnimList)-1:
@@ -190,27 +188,31 @@ while not exitGame:
     # Print background
     surface.blit(background_img, (0, background1_posY ))
     surface.blit(background_img, (0, background2_posY))
-    if background1_posY >= 800:
-        background1_posY = -800
-    if background2_posY >= 800:
-        background2_posY = -800
+    if background1_posY >= screenSize_Y:
+        background1_posY = screenSize_Y - screenSize_Y*2
+    if background2_posY >= screenSize_Y:
+        background2_posY = screenSize_Y - screenSize_Y*2
 #===================#
    
     # Print Marts 1
     martCount = 0 
-    while martCount < martNum:
+    while martCount < len(mart1List):
         surface.blit(mart1List[martCount], (Mart1_pos[martCount]))
         martCount = martCount + 1
+
+        x, y = Mart1_pos[martCount]
+        y = mars_Dir * player_vel/2
+    print ("ini_posY " + str(ini_posY))
+
     # Martians movement
-#    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
 #    mart_posY = mart_posY + mars_Dir * player_vel/2
 #    if mart_posY >= screenSize_Y + martSize_Y:
 #        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
 #        mart_posY = 0
 
-    # Print Player
+# ===== Print Player ===== #
     surface.blit(player_img, (player_posX, player_posY))
-# =====  Print Animations ===== #
+# ===== Print Animations ===== #
     # Main Motor
     surface.blit(motorAnim, (player_posX + playerSize_X/2 - PlayerAnimSize_X/2, player_posY + playerSize_Y)) 
     # Side Motors
