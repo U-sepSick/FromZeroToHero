@@ -8,3 +8,4 @@ Martian2 Martian2.png 128 x 128
 Martian3 Martian3.png 128 x 128
 Martian4 Martian4.png 128 x 128
 Background Background.png 600 x 800
+FX FX.png 600 x 800

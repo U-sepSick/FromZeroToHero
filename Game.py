@@ -55,6 +55,11 @@ while counter < len(filePool):
         screenSize_X, screenSize_Y = int(file[2]), int(file[4])
         background_img = pygame.image.load(file[1])
         background_img  = pygame.transform.scale(background_img , (screenSize_X,screenSize_Y))
+    elif file[0] == "FX":
+        print ("Load file " + str(file[0]) + " => " , file[1] + " - tamaño => " + file[2] + " x " + file[4])
+        screenSize_X, screenSize_Y = int(file[2]), int(file[4])
+        FX_img = pygame.image.load(file[1])
+        FX_img  = pygame.transform.scale(FX_img , (screenSize_X,screenSize_Y))
 
     counter = counter + 1
 # ===== Load animations files ===== #
@@ -95,26 +100,24 @@ Right = False
 IsPushed = []
 # ===== Martians ===== #
 
-martNum = 4
-martOnScreen = 0
+MartList = []
+MartList_pos = []
 
-mart1List = []
-Mart1_pos = []
+MartNum = 5
+Mart_Counter = 0
 
-ini_posX = 0
-ini_posY = 0
+cur_x, cur_y = 0,0
 
-while martOnScreen < martNum:
+while Mart_Counter < MartNum:
 
-    mart1List.append(pygame.image.load(mart1_file))
+    MartList.append(pygame.image.load(mart1_file))
 
-    ini_posX = random.randint(0,screenSize_X - playerSize_X)
-    #ini_posY = random.randint(screenSize_Y , screenSize_Y + ini_posY)
-    ini_posY = random.randint(0 , screenSize_Y)
+    MartList_pos.append ([cur_x, cur_y])
 
-    Mart1_pos.append((ini_posX , ini_posY))
+    cur_x = random.randint(0,screenSize_X - martSize_X)    
+    cur_y = cur_y + martSize_Y*2
 
-    martOnScreen = martOnScreen + 1
+    Mart_Counter = Mart_Counter +1
 
 # ===== Background ===== # 
 background1_posY = screenSize_Y/2
@@ -173,7 +176,7 @@ surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 while not exitGame:
 
     print ("IsPushed " + str(IsPushed))
-    
+
     # Player Animation
     motorImgPos +=1
     if motorImgPos > len(MotorAnimList)-1:
@@ -192,23 +195,30 @@ while not exitGame:
         background1_posY = screenSize_Y - screenSize_Y*2
     if background2_posY >= screenSize_Y:
         background2_posY = screenSize_Y - screenSize_Y*2
+
 #===================#
    
     # Print Marts 1
-    martCount = 0 
-    while martCount < len(mart1List):
-        surface.blit(mart1List[martCount], (Mart1_pos[martCount]))
-        martCount = martCount + 1
 
-        x, y = Mart1_pos[martCount]
-        y = mars_Dir * player_vel/2
-    print ("ini_posY " + str(ini_posY))
+    Mart_Counter = 0
+    
+    while Mart_Counter < MartNum:
 
-    # Martians movement
-#    mart_posY = mart_posY + mars_Dir * player_vel/2
-#    if mart_posY >= screenSize_Y + martSize_Y:
-#        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
-#        mart_posY = 0
+        surface.blit(MartList[Mart_Counter], MartList_pos[Mart_Counter])
+
+        x,y = MartList_pos[Mart_Counter]
+
+        y = y + player_vel/2
+        if y >= screenSize_Y + martSize_Y:
+            y = -martSize_Y
+            for i in range (cur_x, cur_x + martSize_X):
+                if cur_x != i:
+                    x = random.randint(0, screenSize_X - x)
+
+        MartList_pos[Mart_Counter] = (x, y)
+
+        Mart_Counter = Mart_Counter + 1
+
 
 # ===== Print Player ===== #
     surface.blit(player_img, (player_posX, player_posY))
@@ -228,6 +238,7 @@ while not exitGame:
         motorRight_posX = player_posX + playerSize_X/2 + 38
     surface.blit(motorAnim, (motorLeft_posX, player_posY + playerSize_Y))
     surface.blit(motorAnim, (motorRight_posX, player_posY + playerSize_Y))
+
 # ===== Inputs ===== #    
     key = pygame.key.get_pressed()
     # Move Left
