@@ -103,15 +103,16 @@ Mart1_pos = []
 
 ini_posX = 0
 ini_posY = 0
+cur_posY = 0
 
 while martOnScreen < martNum:
 
     mart1List.append(pygame.image.load(mart1_file))
 
     ini_posX = random.randint(0,screenSize_X - playerSize_X)
-    #ini_posY = random.randint(screenSize_Y , screenSize_Y + ini_posY)
     ini_posY = random.randint(0 , screenSize_Y)
 
+    #cur_posY = ini_posY
     Mart1_pos.append((ini_posX , ini_posY))
 
     martOnScreen = martOnScreen + 1
@@ -173,7 +174,7 @@ surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 while not exitGame:
 
     print ("IsPushed " + str(IsPushed))
-    
+
     # Player Animation
     motorImgPos +=1
     if motorImgPos > len(MotorAnimList)-1:
@@ -199,12 +200,8 @@ while not exitGame:
     while martCount < len(mart1List):
         surface.blit(mart1List[martCount], (Mart1_pos[martCount]))
         martCount = martCount + 1
-
-        x, y = Mart1_pos[martCount]
-        y = mars_Dir * player_vel/2
-    print ("ini_posY " + str(ini_posY))
-
     # Martians movement
+#    Mart1_pos[1] = mart_posY + mars_Dir * player_vel/2
 #    mart_posY = mart_posY + mars_Dir * player_vel/2
 #    if mart_posY >= screenSize_Y + martSize_Y:
 #        Mart1_pos = random.randint(0, screenSize_X - mart_posX)
