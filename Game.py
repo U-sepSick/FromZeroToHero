@@ -4,6 +4,9 @@ from pygame.locals import *
 pygame.init()
 fpsClock = pygame.time.Clock()
 
+pygame.font.init()
+fuente = pygame.font.Font("Resources/Font.ttf", 32)
+
 # ===== Open file ===== #
 filePool = open ('filePool.txt').readlines()
 animPool = open ('AnimPool.txt').readlines()
@@ -66,17 +69,18 @@ while counter < len(filePool):
 MotorAnimList = []
 motorImgPos = 0
 ExpAnimList = []
+expImgPos = 0
 animCounter = 0
 while animCounter < len(animPool):
 
     file = animPool[animCounter].split()
 
     if file[0] == "PlayerAnim":
-        PlayerAnimSize_X, PlayerAnimSize_Y = int(file[2]), int(file[4])
-        PlayerAnim_img = pygame.image.load(file[1])
-        PlayerAnim_img = pygame.transform.scale(PlayerAnim_img, (PlayerAnimSize_X, PlayerAnimSize_Y))
+        MotorAnimSize_X, MotorAnimSize_Y = int(file[2]), int(file[4])
+        MotorAnim_img = pygame.image.load(file[1])
+        MotorAnim_img = pygame.transform.scale(MotorAnim_img, (MotorAnimSize_X, MotorAnimSize_Y))
 
-        MotorAnimList.append(PlayerAnim_img)
+        MotorAnimList.append(MotorAnim_img)
     
     if file[0] == "ExplosionAnim":
         ExplosionAnimSize_X, ExplosionAnimSize_Y = int(file[2]), int(file[4])
@@ -94,35 +98,69 @@ player_vel = 10
 mart_posX = 0
 mart_posY = 0
 mars_Dir = 1
+# ===== Score Var ===== # 
+score = 0
+score_txt = fuente.render("Score: " + str(score), True, (190,0,30))
 # ===== Check Keys Var ===== #
 Left = False
 Right = False
 IsPushed = []
-# ===== Martians ===== #
-
-MartList = []
-MartList_pos = []
-
-MartNum = 5
-Mart_Counter = 0
-
-cur_x, cur_y = 0,0
-
-while Mart_Counter < MartNum:
-
-    MartList.append(pygame.image.load(mart1_file))
-
-    MartList_pos.append ([cur_x, cur_y])
-
-    cur_x = random.randint(0,screenSize_X - martSize_X)    
-    cur_y = cur_y + martSize_Y*2
-
-    Mart_Counter = Mart_Counter +1
-
 # ===== Background ===== # 
 background1_posY = screenSize_Y/2
 background2_posY = screenSize_Y/2 - screenSize_Y
 background_vel = player_vel/4
+# ===== Martians generator ===== #
+MartList = []
+MartList_pos = []
+MartNum = 5
+Mart_Counter = 0
+cur_x, cur_y = 0,0
+def Mart_gen():
+
+    global MartList
+    global MartList_pos
+    global MartNum
+    global Mart_Counter
+    global cur_x, cur_y
+
+    while Mart_Counter < MartNum:
+
+        MartList.append(pygame.image.load(mart1_file))
+
+        MartList_pos.append ([cur_x, cur_y])
+
+        cur_x = random.randint(0,screenSize_X - martSize_X)    
+        cur_y = cur_y + martSize_Y*2
+
+        Mart_Counter = Mart_Counter +1
+# ===== Explosion ===== # 
+posX = 0
+posY = 0
+
+def Explosion (x, y):
+    global posX
+    global posY
+    global expImgPos
+
+    posX = x
+    posY = y
+
+    expImgPos +=1
+
+    if expImgPos > len(ExpAnimList)-1:
+        expImgPos = 0
+
+    expAnim = ExpAnimList[expImgPos]
+
+    surface.blit(expAnim, (posX, posY))
+
+    #contador = 0
+    #while contador < len(ExpAnimList):
+
+    #    surface.blit(ExpAnimList[contador], (x, y))
+
+    #    contador = contador + 1
+    print(x,y)
 # ===== Shoot ===== # 
 shooted = False
 shoot_posX = -1000
@@ -134,6 +172,11 @@ def Shoot(x, y):
     global shoot_posY
     global shootSpeed
     global shooted
+    global score
+    global score_txt
+
+    IsDead = False
+    contador = 0
 
     if shoot_posX == -1000:
         shoot_posX = x - shootSize_X/2
@@ -141,48 +184,53 @@ def Shoot(x, y):
 
     surface.blit(shoot_img, (shoot_posX, shoot_posY - 35))
 
-    contador = 0
-        #while contador < len ()
+    while contador < len(MartList_pos) and not IsDead:
 
-#        if shootX >= mart1_posX and shootX <= mart1_posX + martSize_X:
-#            if shootY >= mart1_posY and shootY <= mart + martSize_Y:
-#                print("Muerto")
+        x_mart, y_mart = MartList_pos[contador] 
 
- #       contador = contador + 1
- #       
+        if shoot_posX >= x_mart and shoot_posX <= x_mart + martSize_X:
+            if shoot_posY >= y_mart and shoot_posY <= y_mart + martSize_Y:
+
+                shooted = False
+                shoot_posX = -1000
+                shoot_posY = -1000
+
+                Exp_posX = x_mart
+                Exp_posY = y_mart
+
+                del MartList[contador]
+                del MartList_pos[contador]               
+
+                Explosion(x_mart, y_mart)
+
+                IsDead = True
+
+                score = score + 1
+                score_txt = score_txt = fuente.render("Score: " + str(score), True, (180,0,30))
+
+        contador = contador + 1
+       
     shoot_posY = shoot_posY - shootSpeed
 
     if shoot_posY <= 0:
         shooted = False
         shoot_posX = -1000
         shoot_posY = -1000
-# ===== Explosion ===== # 
-Explosion = False
-Exp_posX = -1000
-Exp_posY = -1000
-def Explosion (x, y):
-    global Exp_posX
-    global Exp_posY
 
-    if Exp_posX == -1000:
-        Exp_posX = x - ExplosionAnimSize_X/2
-        if Exp_posY == -1000:
-            Exp_posY = y - ExplosionAnimSize_Y/2
-# ========== # 
-exitGame = False
 # ===== Print Window ===== #
 surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 # ===== Game ===== # 
+exitGame = False
 while not exitGame:
 
-    print ("IsPushed " + str(IsPushed))
+    Mart_gen()
 
     # Player Animation
     motorImgPos +=1
     if motorImgPos > len(MotorAnimList)-1:
         motorImgPos = 0
     motorAnim = MotorAnimList[motorImgPos]
-
+    
     # Clean window filling of color
     surface.fill((0,0,0))
 # =====  Scrolling background ===== #
@@ -194,15 +242,10 @@ while not exitGame:
     if background1_posY >= screenSize_Y:
         background1_posY = screenSize_Y - screenSize_Y*2
     if background2_posY >= screenSize_Y:
-        background2_posY = screenSize_Y - screenSize_Y*2
-
-#===================#
-   
-    # Print Marts 1
-
-    Mart_Counter = 0
-    
-    while Mart_Counter < MartNum:
+        background2_posY = screenSize_Y - screenSize_Y*2  
+# ===== Print Marts ===== #
+    Mart_Counter = 0   
+    while Mart_Counter < len(MartList):
 
         surface.blit(MartList[Mart_Counter], MartList_pos[Mart_Counter])
 
@@ -218,15 +261,13 @@ while not exitGame:
         MartList_pos[Mart_Counter] = (x, y)
 
         Mart_Counter = Mart_Counter + 1
-
-
 # ===== Print Player ===== #
     surface.blit(player_img, (player_posX, player_posY))
 # ===== Print Animations ===== #
     # Main Motor
-    surface.blit(motorAnim, (player_posX + playerSize_X/2 - PlayerAnimSize_X/2, player_posY + playerSize_Y)) 
+    surface.blit(motorAnim, (player_posX + playerSize_X/2 - MotorAnimSize_X/2, player_posY + playerSize_Y)) 
     # Side Motors
-    motorAnim = pygame.transform.scale(motorAnim, (PlayerAnimSize_X - 20,PlayerAnimSize_Y - 20))
+    motorAnim = pygame.transform.scale(motorAnim, (MotorAnimSize_X - 20,MotorAnimSize_Y - 20))
     if Left == True and IsPushed[len(IsPushed)-1] == "Left":
         motorLeft_posX = player_posX + playerSize_X/2 - 35
         motorRight_posX = player_posX + playerSize_X/2 + 38
@@ -238,7 +279,6 @@ while not exitGame:
         motorRight_posX = player_posX + playerSize_X/2 + 38
     surface.blit(motorAnim, (motorLeft_posX, player_posY + playerSize_Y))
     surface.blit(motorAnim, (motorRight_posX, player_posY + playerSize_Y))
-
 # ===== Inputs ===== #    
     key = pygame.key.get_pressed()
     # Move Left
@@ -313,6 +353,9 @@ while not exitGame:
             Right = False
             IsPushed.remove("Right")
             player_img = idle_img
+# ===== Print Score ===== #
+    score_x, score_y = score_txt.get_rect().size[0], score_txt.get_rect().size[1]
+    surface.blit(score_txt, (10, 10))
 # ===== Update Window ===== #
     pygame.display.update()
     fpsClock.tick(30)
