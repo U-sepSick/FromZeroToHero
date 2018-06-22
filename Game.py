@@ -5,18 +5,20 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 
 pygame.font.init()
-StartFont = pygame.font.Font("Resources/Font.ttf", 80)
-gameFont = pygame.font.Font("Resources/Font.ttf", 32)
+
+# ===== Game fonts ===== #
+def GameFont(txt, color, fontSize):
+
+    return pygame.font.Font("Resources/Font.ttf", fontSize).render(txt, True, color)
 
 # ===== Open file ===== #
-filePool = open ('filePool.txt').readlines()
-animPool = open ('AnimPool.txt').readlines()
-ScorePool = open ('Scores.txt').readlines()
+main_files = open ('filePool.txt').readlines()
+fx_files = open ('AnimPool.txt').readlines()
 # ===== Load main files ===== #
 counter = 0
-while counter < len(filePool):
+while counter < len(main_files):
 
-    file = filePool[counter].split()
+    file = main_files[counter].split()
 
     if file[0] == "Player":
         print ("Load file " + str(file[0]) + " => ", file[1] + " - Size => " + file[2] + " x " + file[4])
@@ -73,9 +75,9 @@ motorImgPos = 0
 ExpAnimList = []
 expImgPos = 0
 animCounter = 0
-while animCounter < len(animPool):
+while animCounter < len(fx_files):
 
-    file = animPool[animCounter].split()
+    file = fx_files[animCounter].split()
 
     if file[0] == "PlayerAnim":
         print ("Load file " + str(file[0]) + " => " , file[1] + " - Size => " + file[2] + " x " + file[4])
@@ -107,7 +109,7 @@ mart_posY = 0
 mars_Dir = 1
 # ===== Score Var ===== # 
 score = 0
-score_txt = gameFont.render("Score: " + str(score), True, Red)
+score_txt = GameFont("Score: " + str(score), Red, 32)
 # ===== Check Keys Var ===== #
 Left = False
 Right = False
@@ -156,21 +158,18 @@ def Mart_gen():
                 if cur_x != i:
                     x = random.randint(0, screenSize_X - x)
 
+        #if len(MartList) < MartNum:
+        #    MartList_pos.append ([cur_x, cur_y])
+
         MartList_pos[Mart_Counter] = (x, y)
 
         Mart_Counter = Mart_Counter + 1
 
 # ===== Explosion ===== # 
-posX = 0
-posY = 0
 
 def Explosion (x, y):
-    global posX
-    global posY
-    global expImgPos
 
-    posX = x
-    posY = y
+    global expImgPos
 
     expImgPos +=1
 
@@ -179,15 +178,7 @@ def Explosion (x, y):
 
     expAnim = ExpAnimList[expImgPos]
 
-    surface.blit(expAnim, (posX, posY))
-
-    #contador = 0
-    #while contador < len(ExpAnimList):
-
-    #    surface.blit(ExpAnimList[contador], (x, y))
-
-    #    contador = contador + 1
-    print(x,y)
+    surface.blit(expAnim, (x, y))
 # ===== Shoot ===== # 
 shooted = False
 shoot_posX = -1000
@@ -226,15 +217,19 @@ def Shoot(x, y):
                 Exp_posX = x_mart
                 Exp_posY = y_mart
 
-                del MartList[contador]
-                del MartList_pos[contador]               
+                #del MartList[contador]
+                #del MartList_pos[contador]
+                
+                MartList_pos[contador] = (random.randint(0,screenSize_X - martSize_X), -500)
 
-                Explosion(x_mart, y_mart)
+                y_mart = y_mart + y_mart
+
+                #Explosion(x_mart, y_mart)
 
                 IsDead = True
 
                 score = score + 1
-                score_txt = score_txt = gameFont.render("Score: " + str(score), True, Red)
+                score_txt = GameFont("Score: " + str(score), Red, 32)
 
         contador = contador + 1
        
@@ -273,7 +268,8 @@ def Background():
         background2_posY = screenSize_Y - screenSize_Y*2  
 
 # ===== Button ===== #
-bttn_txt = StartFont.render("", True, White)
+
+bttn_txt = GameFont("", White, 70)
 
 bttnSize_x = 0
 bttnSize_y = 0
@@ -285,21 +281,34 @@ def Button(txt, x, y, action = None):
 
     global bttnSize_x
     global bttnSize_y
+    global bttn_txt
 
     bttnPosX = x - bttnSize_x/2
     bttnPosY = y - bttnSize_y/2
 
     if bttnPosX + bttnSize_x > mouse[0] > bttnPosX and bttnPosY + bttnSize_y > mouse[1] > bttnPosY:
 
-        bttn_txt = StartFont.render(txt, True, Red)
+        bttn_txt = GameFont(txt, Red, 70)
         
         if click[0] == 1 and action != None:
             action()        
     else:
-        bttn_txt = StartFont.render(txt, True, White)
+        bttn_txt = GameFont(txt, White, 70)
 
     bttnSize_x, bttnSize_y = bttn_txt.get_rect().size[0], bttn_txt.get_rect().size[1]
     surface.blit(bttn_txt, (bttnPosX, bttnPosY))
+
+# ===== Save High Score ===== #
+def SaveHiScore():
+
+    #lista = open ('Scores.txt').readlines()
+    #path = open ('Scores.txt', 'w')
+
+    #for i  in lista:      
+    #    lista.append(str(score))
+    #    path.write(i)
+
+    #path.close()
 
 # ===== Update Window ===== #
 def Update():
@@ -314,9 +323,11 @@ def QuitGame():
             quit()
 
 # ===== Game intro ===== # 
-HiScore_txt = gameFont.render("Hi - Score > 100p", True, White)
+HiScore_txt = GameFont("Hi - Score > 100p", White, 32)
 intro = True
 def IntroGame():
+
+    txt = ""
 
     while intro:
 
@@ -327,13 +338,45 @@ def IntroGame():
        
         Button("START", screenSize_X/2, screenSize_Y/3, GameScene)
 
+
+        #if ScorePool[0] == "":
+
+        #    txt = "Hi - Score > 0"
+        #else:
+        #    txt = "Hi - Score > " + ScorePool[0]
+
+        HiScore_txt = GameFont(txt, White, 32)
+
         HiScore_x, HiScore_y = HiScore_txt.get_rect().size[0], HiScore_txt.get_rect().size[1]
         surface.blit(HiScore_txt, (screenSize_X/2 - HiScore_x/2, screenSize_Y/2 - HiScore_y/2))
 
-
-
         Update()
         QuitGame()
+
+# ===== Gameover ===== #
+def GameOver():
+
+    contador = 0
+
+    while contador < len(MartList_pos):
+
+        x_mart, y_mart = MartList_pos[contador] 
+
+        if player_posX >= x_mart and player_posX <= x_mart + martSize_X:
+            if player_posY >= y_mart and player_posY <= y_mart + martSize_Y:
+
+                Explosion(x_mart, y_mart)
+
+                gameOver_txt = GameFont("Game over", Red, 70)
+
+                gameOver_x, gameOver_y = gameOver_txt.get_rect().size[0], gameOver_txt.get_rect().size[1]
+                surface.blit(gameOver_txt, (screenSize_X/2 - gameOver_x/2, screenSize_Y/2 - gameOver_y/2))
+
+                SaveHiScore()
+
+                print ("GameOver")
+
+        contador = contador + 1
 
 # ===== Game Loop ===== #
 
@@ -343,6 +386,8 @@ def GameScene():
     animStart = True
 
     while not exitGame:
+
+        print(exitGame)
 
         global intro
         global motorImgPos
@@ -364,22 +409,13 @@ def GameScene():
 
         if animStart == True:
 
-            txt1 = "Ready !!"
-            txt2 = "GO !!!"
-
-            animStart_txt = StartFont.render(txt1, True, Red)
+            animStart_txt = GameFont("Save the planet !!!", Red, 40)
 
             if player_posY > 500:
                 player_posY = player_posY - 1 * player_vel/2
 
-                if player_posY < screenSize_Y:
-                    animStart_txt = StartFont.render(txt1, True, Red)
-
-                if player_posY < 600:
-                    animStart_txt = StartFont.render(txt2, True, Red)
                 
             else:
-                animStart_txt = StartFont.render(txt2, True, Red)
                 animStart = False
 
             animStart_x, animStart_y = animStart_txt.get_rect().size[0], animStart_txt.get_rect().size[1]
@@ -501,6 +537,7 @@ def GameScene():
         
         surface.blit(score_txt, (10, 10))
         
+        GameOver()
         Update()
 
 IntroGame()
