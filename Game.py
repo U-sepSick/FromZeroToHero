@@ -10,7 +10,6 @@ pygame.font.init()
 def GameFont(txt, color, fontSize):
 
     return pygame.font.Font("Resources/Font.ttf", fontSize).render(txt, True, color)
-
 # ===== Open file ===== #
 main_files = open ('filePool.txt').readlines()
 fx_files = open ('AnimPool.txt').readlines()
@@ -247,7 +246,6 @@ surface = pygame.display.set_mode((screenSize_X, screenSize_Y))
 background1_posY = screenSize_Y/2
 background2_posY = screenSize_Y/2 - screenSize_Y
 background_vel = player_vel/4
-
 def Background():
 
     global background1_posY
@@ -266,7 +264,6 @@ def Background():
         background1_posY = screenSize_Y - screenSize_Y*2
     if background2_posY >= screenSize_Y:
         background2_posY = screenSize_Y - screenSize_Y*2  
-
 # ===== Button ===== #
 
 bttn_txt = GameFont("", White, 70)
@@ -301,14 +298,15 @@ def Button(txt, x, y, action = None):
 # ===== Save High Score ===== #
 def SaveHiScore():
 
-    #lista = open ('Scores.txt').readlines()
-    #path = open ('Scores.txt', 'w')
+    lista = open ('Scores.txt').readlines()
+    path = open ('Scores.txt', 'w')
 
-    #for i  in lista:      
-    #    lista.append(str(score))
-    #    path.write(i)
+    #lista.append(str(score))
 
-    #path.close()
+    for i in lista:      
+        path.write(i)
+
+    path.close()
 
 # ===== Update Window ===== #
 def Update():
@@ -358,36 +356,38 @@ def GameOver():
 
     contador = 0
 
-    while contador < len(MartList_pos):
+    #while contador < len(MartList_pos):
 
-        x_mart, y_mart = MartList_pos[contador] 
+    x_mart, y_mart = MartList_pos[contador] 
 
-        if player_posX >= x_mart and player_posX <= x_mart + martSize_X:
-            if player_posY >= y_mart and player_posY <= y_mart + martSize_Y:
+    if player_posX >= x_mart and player_posX <= x_mart + martSize_X:
+        if player_posY >= y_mart and player_posY <= y_mart + martSize_Y:
 
-                Explosion(x_mart, y_mart)
+            #Explosion(x_mart, y_mart)
 
-                gameOver_txt = GameFont("Game over", Red, 70)
+            gameOver_txt = GameFont("Game over", Red, 70)
 
-                gameOver_x, gameOver_y = gameOver_txt.get_rect().size[0], gameOver_txt.get_rect().size[1]
-                surface.blit(gameOver_txt, (screenSize_X/2 - gameOver_x/2, screenSize_Y/2 - gameOver_y/2))
+            gameOver_x, gameOver_y = gameOver_txt.get_rect().size[0], gameOver_txt.get_rect().size[1]
+            surface.blit(gameOver_txt, (screenSize_X/2 - gameOver_x/2, screenSize_Y/2 - gameOver_y/2))
 
-                SaveHiScore()
+            #SaveHiScore()
 
-                print ("GameOver")
+            
 
-        contador = contador + 1
+            print ("GameOver")
 
+        #contador = contador + 1
+            exitGame = False
+
+            print ("var exitGame " + str(exitGame))
 # ===== Game Loop ===== #
-
+playGame = True
 def GameScene():
     
-    exitGame = False
     animStart = True
+    global playGame
 
-    while not exitGame:
-
-        print(exitGame)
+    while playGame:
 
         global intro
         global motorImgPos
@@ -401,12 +401,9 @@ def GameScene():
         intro = False
         # Clean window filling of color
         surface.fill((0,0,0))
-
         # ===== Print Background ===== #
         Background()
-
         # ===== Anim Start ===== #
-
         if animStart == True:
 
             animStart_txt = GameFont("Save the planet !!!", Red, 40)
@@ -420,20 +417,16 @@ def GameScene():
 
             animStart_x, animStart_y = animStart_txt.get_rect().size[0], animStart_txt.get_rect().size[1]
             surface.blit(animStart_txt, (screenSize_X/2 - animStart_x/2, screenSize_Y/2 - animStart_y/2))
-
         # ===== Print Marts ===== #
         if animStart == False:
             Mart_gen()
-
         # Player Animation
         motorImgPos +=1
         if motorImgPos > len(MotorAnimList)-1:
             motorImgPos = 0
-        motorAnim = MotorAnimList[motorImgPos]
-    
+        motorAnim = MotorAnimList[motorImgPos]   
     # ===== Print Player ===== #
         surface.blit(player_img, (player_posX, player_posY))
-
     # ===== Print Animations ===== #
         # Main Motor
         surface.blit(motorAnim, (player_posX + playerSize_X/2 - MotorAnimSize_X/2, player_posY + playerSize_Y)) 
@@ -530,15 +523,18 @@ def GameScene():
 
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exitGame = True
+                playGame = True
                 quit()
 
     # ===== Print Score ===== #
         
         surface.blit(score_txt, (10, 10))
-        
+
         GameOver()
+   
         Update()
+
+        print(playGame)
 
 IntroGame()
 GameScene()
