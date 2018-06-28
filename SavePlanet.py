@@ -84,19 +84,98 @@ def QuitGame():
         if quitGame.type == pygame.QUIT:
             pygame.quit()
             quit()
-
-
 # ===== Player ===== #
+
 player_posX = screenSize_X/2 - playerSize_X/2
 player_posY = screenSize_Y + playerSize_Y
 player_vel = 10
+animStart = True
+
 def PlayerPrint():
 
-	global player_posX
-	global player_posY
+    global player_posX	
+    global player_posY
+    global animStart
 
-	# ===== Print Player ===== #
-	surface.blit(player_img, (player_posX, player_posY))
+    # ===== Anim Start ===== #
+    if animStart == True:
+
+        animStart_txt = GameFont("Save the planet !!!", Red, 40)
+
+        if player_posY > 500:
+            player_posY = player_posY - 1 * player_vel/2
+
+                
+        else:
+            animStart = False
+
+        animStart_x, animStart_y = animStart_txt.get_rect().size[0], animStart_txt.get_rect().size[1]
+        surface.blit(animStart_txt, (screenSize_X/2 - animStart_x/2, screenSize_Y/2 - animStart_y/2))
+
+    # ===== Print Player ===== #
+    surface.blit(player_img, (player_posX, player_posY))
+
+# ===== Shoot ===== #
+
+#shooted = False
+#shoot_posX = -1000
+#shoot_posY = -1000
+#shootSpeed = 30
+
+#def Shoot(x, y):
+
+#    global shoot_posX
+#    global shoot_posY
+#    global shootSpeed
+#    global shooted
+#    global score
+#    global score_txt
+
+#    IsDead = False
+#    contador = 0
+
+#    if shoot_posX == -1000:
+#        shoot_posX = x - shootSize_X/2
+#        shoot_posY = y
+
+#    surface.blit(shoot_img, (shoot_posX, shoot_posY - 35))
+
+#    while contador < len(MartList_pos) and not IsDead:
+
+#        x_mart, y_mart = MartList_pos[contador] 
+
+#        if shoot_posX >= x_mart and shoot_posX <= x_mart + martSize_X:
+#            if shoot_posY >= y_mart and shoot_posY <= y_mart + martSize_Y:
+
+#                shooted = False
+#                shoot_posX = -1000
+#                shoot_posY = -1000
+
+#                Exp_posX = x_mart
+#                Exp_posY = y_mart
+
+#                #del MartList[contador]
+#                #del MartList_pos[contador]
+                
+#                MartList_pos[contador] = (random.randint(0,screenSize_X - martSize_X), -500)
+
+#                y_mart = y_mart + y_mart
+
+#                #Explosion(x_mart, y_mart)
+
+#                IsDead = True
+
+#                score = score + 1
+#                score_txt = GameFont("Score: " + str(score), Red, 32)
+
+#        contador = contador + 1
+       
+#    shoot_posY = shoot_posY - shootSpeed
+
+#    if shoot_posY <= 0:
+#        shooted = False
+#        shoot_posX = -1000
+#        shoot_posY = -1000
 
 # ===== Background ===== # 
 background1_posY = screenSize_Y/2
@@ -121,6 +200,121 @@ def Background():
     if background2_posY >= screenSize_Y:
         background2_posY = screenSize_Y - screenSize_Y*2
 
+# ===== Button ===== #
+
+def Button(txt, x, y, action = None):
+
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    bttn_txt = GameFont(txt, White, 70)
+    bttnSize_x, bttnSize_y = bttn_txt.get_rect().size[0], bttn_txt.get_rect().size[1]
+
+    bttnPosX = x - bttnSize_x/2
+    bttnPosY = y - bttnSize_y/2
+
+    if bttnPosX + bttnSize_x > mouse[0] > bttnPosX and bttnPosY + bttnSize_y > mouse[1] > bttnPosY:
+
+        bttn_txt = GameFont(txt, Red, 70)
+        
+        if click[0] == 1 and action != None:
+            action()
+    else:
+        bttn_txt = GameFont(txt, White, 70)
+
+    surface.blit(bttn_txt, (bttnPosX, bttnPosY))
+# ===== Inputs ===== #
+
+
+
+def Inputs():
+
+    Left = False
+    Right = False
+    IsPushed = []
+
+    global player_img
+    global player_posX
+    global player_posY
+    global shooted
+
+    key = pygame.key.get_pressed()
+    print('entra a input')
+    # Move Left
+    if key[pygame.K_LEFT] and IsPushed[len(IsPushed)-1] == "Left":
+        player_img = turnL_img
+        player_posX = player_posX - player_vel
+        # Move up
+        if key[pygame.K_UP]:
+            player_posY = player_posY - player_vel
+            # Upper limit
+            if player_posY <= 0:
+                player_posY = 0
+        # Move down
+        if key[pygame.K_DOWN]:
+            player_posY = player_posY + player_vel
+            # Lower limit
+            if player_posY >= screenSize_Y - playerSize_Y:
+                player_posY = screenSize_Y - playerSize_Y
+        # Left limit
+        if player_posX <= 0:
+            player_posX = 0
+    # Move Right
+    elif key[pygame.K_RIGHT] and IsPushed[len(IsPushed)-1] == "Right":
+        player_img = turnR_img
+        player_posX = player_posX + player_vel
+        # move up
+        if key[pygame.K_UP]:
+            player_posY = player_posY - player_vel
+            # upper limit
+            if player_posY <= 0:
+                player_posY = 0
+        # move down
+        if key[pygame.K_DOWN]:
+            player_posY = player_posY + player_vel
+            # lower limit
+            if player_posY >= screenSize_Y - playerSize_Y:
+                player_posY = screenSize_Y - playerSize_Y
+        # right limit
+        if player_posX >= screenSize_X - playerSize_X:
+            player_posX = screenSize_X - playerSize_X
+    # Move up
+    elif key[pygame.K_UP]:
+        player_posY = player_posY - player_vel
+        # Upper limit
+        if player_posY <= 0:
+            player_posY = 0
+    # Move down
+    elif key[pygame.K_DOWN]:
+        player_posY = player_posY + player_vel
+        # Lower limit
+        if player_posY >= screenSize_Y - playerSize_Y:
+            player_posY = screenSize_Y - playerSize_Y
+
+## ===== Shoot ===== #
+#    if key[pygame.K_SPACE]:
+#        if not shooted:
+#            shooted = True
+#    if shooted:        
+#        Shoot(player_posX + playerSize_X/2, player_posY)
+
+# ===== Check Keys ===== #
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            IsPushed.append("Left")
+            Left = True
+        elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+            IsPushed.remove("Left")
+            Left = False
+            player_img = idle_img
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            Right = True
+            IsPushed.append("Right")
+        elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+            Right = False
+            IsPushed.remove("Right")
+            player_img = idle_img
+
 # ===== Game Control Var ===== #
 
 intro = True
@@ -142,50 +336,53 @@ def Scenes():
 # ===== Intro ===== #
 def IntroScene():
 
-	global intro
-	global game
-	global gameOver
+    global intro
+    global game
+    global gameOver
 
-	while intro == True:
+    while intro == True:
 
-		# Clean window filling of color
-		surface.fill(Black)
+        # Clean window filling of color
+        surface.fill(Black)
 
-		Background()
+        Background()
+        Button('START', screenSize_X/2, screenSize_Y/3, GameScene)
 
-		Intro_txt = GameFont('Intro', White, 32)
+        txt = ''
+        HiScore_txt = GameFont(txt, White, 32)
 
-		Intro_x, Intro_y = Intro_txt.get_rect().size[0], Intro_txt.get_rect().size[1]
-		surface.blit(Intro_txt, (screenSize_X/2 - Intro_x/2, screenSize_Y/2 - Intro_y/2))
+        HiScore_x, HiScore_y = HiScore_txt.get_rect().size[0], HiScore_txt.get_rect().size[1]
+        surface.blit(HiScore_txt, (screenSize_X/2 - HiScore_x/2, screenSize_Y/2 - HiScore_y/2))
 
-		Update()
-		Scenes()
-		QuitGame()
-        print('Intro ' + str(intro))
+        Update()
+        Scenes()
+        QuitGame()
+        print('Estas en Intro')
 
 # ===== Game ===== #
 def GameScene():
 
-	global intro
-	global game
-	global gameOver
+    global intro
+    global game
+    global gameOver
 
-	while game:
+    while game:
 
-		# Clean window filling of color
-		surface.fill(Black)
+        # Clean window filling of color
+        surface.fill(Black)
 
-		Background()
+        Background()
 
-		Game_txt = GameFont('Game', White, 32)
+        Game_x, Game_y = Game_txt.get_rect().size[0], Game_txt.get_rect().size[1]
+        surface.blit(Game_txt, (screenSize_X/2 - Game_x/2, screenSize_Y/2 - Game_y/2))
 
-		Game_x, Game_y = Game_txt.get_rect().size[0], Game_txt.get_rect().size[1]
-		surface.blit(Game_txt, (screenSize_X/2 - Game_x/2, screenSize_Y/2 - Game_y/2))
-
-		Update()
-		Scenes()
-		QuitGame()
-		print('Game ' + str(game))
+        PlayerPrint()
+        #Inputs()
+        #Shoot()
+        Update()
+        #Scenes()
+        QuitGame()
+        print('Game ' + str(game))
 
 # ===== GameOver ===== #
 def GameOverScene():
